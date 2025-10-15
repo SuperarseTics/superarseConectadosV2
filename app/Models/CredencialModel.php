@@ -10,7 +10,6 @@ class CredencialModel extends Database
     $db = $this->getConnection();
 
     try {
-      // 1. Obtener el nombre de usuario del estudiante (el campo 'usuario' de la tabla users)
       $userQuery = "SELECT usuario FROM users WHERE id = :userId LIMIT 1";
       $userStmt = $db->prepare($userQuery);
       $userStmt->execute([':userId' => $userId]);
@@ -20,8 +19,6 @@ class CredencialModel extends Database
         return [];
       }
       $plataformaUsuario = $userInfo['usuario'];
-
-      // 2. Obtener la lista estática de plataformas y contraseñas (quemadas)
       $plataformaQuery = "SELECT 
                                 plataforma, 
                                 url AS link_acceso,
@@ -34,8 +31,6 @@ class CredencialModel extends Database
       $plataformaStmt = $db->prepare($plataformaQuery);
       $plataformaStmt->execute();
       $plataformas = $plataformaStmt->fetchAll(PDO::FETCH_ASSOC);
-
-      // 3. Combinar los resultados
       $credencialesFinal = [];
       foreach ($plataformas as $p) {
         $credencialesFinal[] = [

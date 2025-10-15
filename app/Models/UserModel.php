@@ -11,29 +11,17 @@ class UserModel {
         $database = new Database();
         $this->conn = $database->getConnection();
     }
-
-    /**
-     * Busca un estudiante por su número de identificación (cédula)
-     * @param string $cedula El número de identificación del estudiante
-     * @return array|null Los datos del usuario si es encontrado, o null
-     */
     public function findByCedula($cedula) {
-        // En tu tabla 'users', el campo es 'numero_identificacion'
         $query = "SELECT * FROM " . $this->table_name . " WHERE numero_identificacion = :cedula LIMIT 1";
 
         $stmt = $this->conn->prepare($query);
-        
-        // Limpiar y enlazar el parámetro
         $stmt->bindParam(':cedula', $cedula);
 
         try {
             $stmt->execute();
             $user = $stmt->fetch();
-            
-            // Si encuentra un resultado, lo retorna, si no, retorna false (o null, dependiendo de la configuración de PDO)
             return $user ? $user : null;
         } catch (PDOException $e) {
-            // Manejo de error de consulta SQL
             error_log("Error al buscar usuario por cédula: " . $e->getMessage());
             return null;
         }

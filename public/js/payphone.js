@@ -1,9 +1,7 @@
 document
   .getElementById("payphone-link")
   .addEventListener("click", function (e) {
-    e.preventDefault(); // Previene la acción por defecto del botón
-
-    // 1. Validar y obtener datos
+    e.preventDefault();
     const cantidadInput = document
       .getElementById("cantidad")
       .value.trim()
@@ -22,18 +20,13 @@ document
     const identificacion = studentIdElement
       ? studentIdElement.getAttribute("data-id")
       : "SIN_ID";
-    const referenciaFinal = `ID: ${identificacion} | Ref: ${
-      referencia || "Pago Estudiantil"
-    }`;
-
-    // 2. Construir la URL que llama al CONTROLADOR (Ruta: /public/pago)
+    const referenciaFinal = `ID: ${identificacion} | Ref: ${referencia || "Pago Estudiantil"
+      }`;
     const url =
       `/superarseconectadosv2/public/pago?cantidad=` +
       encodeURIComponent(cantidad) +
       `&referencia=` +
       encodeURIComponent(referenciaFinal) +
-      `&vista=pasarela`; // 👈 **AÑADIMOS UNA BANDERA/FLAG**
-
-    // 3. Abrir la nueva pestaña (usa el target blank que ya tienes)
+      `&vista=pasarela`;
     window.open(url, "_blank");
   });

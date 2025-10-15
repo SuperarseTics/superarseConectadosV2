@@ -1,5 +1,4 @@
-// Codifica el array de PHP a una cadena JSON limpia
-// Script para la navegación de Tabs (DEBE IR ANTES DE LOS ARCHIVOS JS)
+
 document.addEventListener("DOMContentLoaded", function () {
   const tabButtons = document.querySelectorAll(".tab-button");
   const tabPanes = document.querySelectorAll(".tab-pane");
@@ -35,7 +34,5 @@ document.addEventListener("DOMContentLoaded", function () {
       activateTab(button.dataset.tab);
     });
   });
-
-  // Activar el tab 'informacion' por defecto
   activateTab("informacion");
 });
