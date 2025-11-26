@@ -1,16 +1,16 @@
 <div id="pagos" class="tab-pane hidden">
     <div id="student-id-data" data-id="<?php echo htmlspecialchars($data['infoPersonal']['numero_identificacion'] ?? 'SIN_ID'); // USANDO $data 
-                                    ?>" style="display: none;">
+                                        ?>" style="display: none;">
     </div>
 
     <h3 class="text-xl font-semibold text-superarse-morado-oscuro mb-4">Resumen Financiero</h3>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <!--<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
 
         <div class="bg-green-100 p-4 rounded-lg shadow-md border border-green-300">
             <p class="text-sm font-medium text-green-700">ABONO TOTAL</p>
             <p class="text-2xl font-bold text-green-800 mt-1">
                 $<?php echo htmlspecialchars($data['infoPagos']['abono_total'] ?? '0.00'); // USANDO $data 
-                                    ?>
+                    ?>
             </p>
         </div>
 
@@ -18,7 +18,7 @@
             <p class="text-sm font-medium text-red-700">SALDO TOTAL PENDIENTE</p>
             <p class="text-2xl font-bold text-red-800 mt-1">
                 $<?php echo htmlspecialchars($data['infoPagos']['saldo_total'] ?? '0.00'); // USANDO $data 
-                                    ?>
+                    ?>
             </p>
         </div>
 
@@ -26,7 +26,55 @@
             <p class="text-sm font-medium text-blue-700">ESTADO / OBSERVACIÓN</p>
             <p class="text-base text-blue-800 mt-2">
                 <?php echo nl2br(htmlspecialchars($data['infoPagos']['observacion'] ?? 'Sin observaciones de pago.')); // USANDO $data 
-                                ?>
+                ?>
+            </p>
+        </div>
+    </div>-->
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+
+        <!-- Tarjeta 1: ABONO TOTAL (EXISTENTE) -->
+        <div class="bg-green-100 p-4 rounded-lg shadow-md border border-green-300">
+            <p class="text-sm font-medium text-green-700">ABONO TOTAL</p>
+            <p class="text-2xl font-bold text-green-800 mt-1">
+                $<?php echo htmlspecialchars($data['infoPagos']['ABONO_TOTAL2'] ?? '0.00'); // Usando ABONO_TOTAL2, el nombre estandarizado en DB 
+                    ?>
+            </p>
+        </div>
+
+        <!-- Tarjeta 2: SALDO TOTAL PENDIENTE (EXISTENTE) -->
+        <div class="bg-red-100 p-4 rounded-lg shadow-md border border-red-300">
+            <p class="text-sm font-medium text-red-700">SALDO TOTAL PENDIENTE</p>
+            <p class="text-2xl font-bold text-red-800 mt-1">
+                $<?php echo htmlspecialchars($data['infoPagos']['SALDO_TOTAL_FINAL'] ?? '0.00'); // Usando SALDO_TOTAL_FINAL, el nombre estandarizado en DB 
+                    ?>
+            </p>
+        </div>
+
+        <!-- Tarjeta 3: SALDO PENDIENTE PERIODO ANTERIOR (NUEVA) -->
+        <div class="bg-yellow-100 p-4 rounded-lg shadow-md border border-yellow-300">
+            <p class="text-sm font-medium text-yellow-700">SALDO PERIODO ANTERIOR</p>
+            <p class="text-2xl font-bold text-yellow-800 mt-1">
+                $<?php echo htmlspecialchars($data['infoPagos']['SALDO_PENDIENTE_PERIODO_ANTERIOR'] ?? '0.00'); // NUEVO CAMPO: alineado a DB 
+                    ?>
+            </p>
+        </div>
+
+        <!-- Tarjeta 4: VALOR CUOTA MENSUAL (NUEVA) -->
+        <div class="bg-indigo-100 p-4 rounded-lg shadow-md border border-indigo-300">
+            <p class="text-sm font-medium text-indigo-700">VALOR CUOTA MENSUAL</p>
+            <p class="text-2xl font-bold text-indigo-800 mt-1">
+                $<?php echo htmlspecialchars($data['infoPagos']['VALOR_CUOTA_MENSUAL'] ?? '0.00'); // NUEVO CAMPO: alineado a DB 
+                    ?>
+            </p>
+        </div>
+
+        <!-- Tarjeta 5: ESTADO / OBSERVACIÓN (EXISTENTE) -->
+        <!-- Esta tarjeta ocupa el quinto espacio en el grid de 5 columnas -->
+        <div class="bg-blue-100 p-4 rounded-lg shadow-md border border-blue-300">
+            <p class="text-sm font-medium text-blue-700">OBSERVACIÓN</p>
+            <p class="text-base text-blue-800 mt-2 overflow-auto max-h-20 text-ellipsis">
+                <?php echo nl2br(htmlspecialchars($data['infoPagos']['observacion'] ?? 'Sin observaciones de pago.')); // Se mantiene la observación 
+                ?>
             </p>
         </div>
     </div>
@@ -39,21 +87,21 @@
 
     <div class="flex space-x-4 mb-6" id="bank-buttons">
         <?php if (!empty($data['bancos'])): // USANDO $data 
-                        ?>
-        <?php foreach ($data['bancos'] as $index => $banco): // USANDO $data 
-                            ?>
-        <button type="button"
-            class="bank-tab-button px-6 py-3 rounded-lg text-white font-semibold transition duration-300 
+        ?>
+            <?php foreach ($data['bancos'] as $index => $banco): // USANDO $data 
+            ?>
+                <button type="button"
+                    class="bank-tab-button px-6 py-3 rounded-lg text-white font-semibold transition duration-300 
                                     <?php echo ($index === 0) ? 'bg-superarse-morado-oscuro hover:bg-superarse-morado-medio' : 'bg-gray-400 hover:bg-gray-500'; ?>"
-            data-bank-id="<?php echo htmlspecialchars($banco['id']); ?>"
-            data-bank-name="<?php echo htmlspecialchars($banco['nombre_banco']); ?>"
-            data-account-type="<?php echo htmlspecialchars($banco['tipo_cuenta']); ?>"
-            data-account-number="<?php echo htmlspecialchars($banco['numero_cuenta']); ?>">
-            <?php echo htmlspecialchars($banco['nombre_banco']); ?>
-        </button>
-        <?php endforeach; ?>
+                    data-bank-id="<?php echo htmlspecialchars($banco['id']); ?>"
+                    data-bank-name="<?php echo htmlspecialchars($banco['nombre_banco']); ?>"
+                    data-account-type="<?php echo htmlspecialchars($banco['tipo_cuenta']); ?>"
+                    data-account-number="<?php echo htmlspecialchars($banco['numero_cuenta']); ?>">
+                    <?php echo htmlspecialchars($banco['nombre_banco']); ?>
+                </button>
+            <?php endforeach; ?>
         <?php else: ?>
-        <p class="text-gray-500">No hay información de bancos disponible.</p>
+            <p class="text-gray-500">No hay información de bancos disponible.</p>
         <?php endif; ?>
     </div>
 
