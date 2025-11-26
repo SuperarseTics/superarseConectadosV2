@@ -6,6 +6,7 @@ require_once '../app/Models/PagoModel.php';
 require_once '../app/Models/AsignaturaModel.php';
 require_once '../app/Models/CredencialModel.php';
 require_once '../app/Models/BancoModel.php';
+require_once '../app/Models/PasantiaModel.php';
 
 class EstudianteController
 {
@@ -37,12 +38,37 @@ class EstudianteController
             $asignaturaModel = new AsignaturaModel();
             $credencialModel = new CredencialModel();
             $bancoModel = new BancoModel();
+            $pasantiaModel = new PasantiaModel();
 
             $infoPersonal = $userModel->getUserInfoByIdentificacion($identificacion);
+            $infoPrograma = $userModel->getProgramaInfoByIdentificacion($identificacion);
             $infoPagos = $pagoModel->getPagosByIdentificacion($identificacion);
             $infoAsignaturas = $asignaturaModel->getAsignaturasByIdentificacion($identificacion);
             $infoCredenciales = $credencialModel->getCredencialesByUserId($idUsuario);
+            $tutoresAcademicos = $userModel->getTutoresAcademicosByPrograma($infoPersonal['programa']);
+            $infoProyectos = $pasantiaModel->getProyectos();
+            $modalidades = $pasantiaModel->getPracticaModalidad();
+            $infoPractica = $pasantiaModel->getActivePracticaByUserId($idUsuario);
+            $infoStatusPractica = $pasantiaModel->getStatusPracticaByUserId($idUsuario);
             $infoBancos = $bancoModel->getAllBancosActivos();
+            if (!empty($infoPractica['id_practica']) && is_numeric($infoPractica['id_practica'])) {
+                $actividadesDiarias = $pasantiaModel->getActividadesDiariasPaginated(
+                    practicaId: (int)$infoPractica['id_practica'],
+                    offset: 0,
+                    limit: 10
+                );
+            } else {
+                $actividadesDiarias = [];
+            }
+            if (!empty($infoPractica['id_practica']) && is_numeric($infoPractica['id_practica'])) {
+                $programaTrabajo = $pasantiaModel->getProgramaTrabajo(
+                    practicaId: (int)$infoPractica['id_practica'],
+                    limit: 10,
+                    offset: 0
+                );
+            } else {
+                $programaTrabajo = [];
+            }
             $data['nombreCompleto'] = $_SESSION['nombres_completos'] ?? 'Estudiante';
             $data['infoPagos'] = $infoPagos ?? [
                 'abono_total' => 'N/D',
@@ -54,9 +80,18 @@ class EstudianteController
             $data['infoCredenciales'] = $infoCredenciales ?? [];
             $data['bancos'] = $infoBancos ?? [];
             $data['basePath'] = $this->basePath;
+            $data['modalidades'] = $modalidades ?? [];
+            $data['tutoresAcademicos'] = $tutoresAcademicos ?? [];
+            $data['cantidadTutores'] = is_array($tutoresAcademicos) ? count($tutoresAcademicos) : 0;
+            $data['infoPractica'] = $infoPractica ?? null;
+            $data['infoStatusPractica'] = $infoStatusPractica ?? null;
+            $data['actividadesDiarias'] = $actividadesDiarias ?? [];
+            $data['programaTrabajo'] = $programaTrabajo ?? [];
+            $data['infoPrograma'] = $infoPrograma ?? [];
+            $data['infoProyectos'] = $infoProyectos ?? [];
 
-            $vista_contenido = __DIR__ . '/../Views/dashboard/index.php'; 
-            require_once __DIR__ . '/../Views/layouts/main_layout.php'; 
+            $vista_contenido = __DIR__ . '/../Views/dashboard/index.php';
+            require_once __DIR__ . '/../Views/layouts/main_layout.php';
         } catch (Exception $e) {
             error_log("Error en EstudianteController: " . $e->getMessage());
             header("Location: " . $this->basePath . "/login?error=error_sistema");

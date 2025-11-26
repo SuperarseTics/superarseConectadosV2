@@ -1,7 +1,11 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 require_once '../app/Controllers/LoginController.php';
 require_once '../app/Controllers/EstudianteController.php';
 require_once '../app/Controllers/PagoController.php';
+require_once '../app/Controllers/PasantiaController.php';
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
@@ -20,8 +24,6 @@ if ($uri === '/pagos/upload-comprobante' && $method === 'POST') {
     $controller->uploadComprobante();
     exit();
 }
-
-
 switch ($uri) {
     case '/':
     case '/login':
@@ -59,6 +61,75 @@ switch ($uri) {
         $controller = new PagoController();
         $controller->procesarPago();
         break;
+
+    case '/pasantias/buscarEntidadPorRUC':
+        $controller = new PasantiaController();
+        $controller->buscarEntidadPorRUC();
+        exit();
+
+    case '/pasantias/saveFaseOne':
+        if ($method === 'POST') {
+            $controller = new PasantiaController();
+            $controller->saveFaseOne();
+        } else {
+            header("Location: " . $basePath . "/login");
+        }
+        break;
+
+    case '/pasantias/addActividadDiaria':
+        if ($method === 'POST') {
+            $controller = new PasantiaController();
+            $controller->addActividadDiaria();
+        } else {
+            header("Location: " . $basePath . "/login");
+        }
+        break;
+
+    case '/pasantias/updateActividadDiaria':
+        if ($method === 'POST') {
+            $controller = new PasantiaController();
+            $controller->updateActividadDiaria();
+        } else {
+            header("Location: " . $basePath . "/login");
+        }
+        break;
+
+    case '/pasantias/deleteActividadDiaria':
+        if ($method === 'POST') {
+            $id = $_POST['id'] ?? 0;
+            $controller = new PasantiaController();
+            $controller->deleteActividadDiaria($id);
+        } else {
+            header("Location: " . $basePath . "/login");
+        }
+        break;
+    case '/pasantias/addProgramaTrabajo':
+        if ($method === 'POST') {
+            $controller = new PasantiaController();
+            $controller->addProgramaTrabajo();
+        } else {
+            header("Location: " . $basePath . "/login");
+        }
+        break;
+
+    case '/pasantias/updateProgramaTrabajo':
+        if ($method === 'POST') {
+            $controller = new PasantiaController();
+            $controller->updateProgramaTrabajo();
+        } else {
+            header("Location: " . $basePath . "/login");
+        }
+        break;
+
+    case '/pasantias/deleteProgramaTrabajo':
+        if ($method === 'POST') {
+            $controller = new PasantiaController();
+            $controller->deleteProgramaTrabajo();
+        } else {
+            header("Location: " . $basePath . "/login");
+        }
+        break;
+
 
     default:
         http_response_code(404);
