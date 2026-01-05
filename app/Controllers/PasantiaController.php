@@ -1,5 +1,9 @@
 <?php
 // app/Controllers/PasantiaController.php
+
+use Dompdf\Dompdf;
+use Dompdf\Options;
+
 require_once '../app/Models/PasantiaModel.php';
 require_once '../app/Models/UserModel.php';
 
@@ -464,5 +468,65 @@ class PasantiaController
 
         header("Location: {$this->basePath}/estudiante/informacion");
         exit();
+    }
+
+    public function generatePdf(int $id_practica)
+    {
+        // 1. Obtener la data del Modelo
+        $data = $this->pasantiaModel->getPracticeFullData($id_practica);
+
+        if (empty($data) || empty($data['infoPractica']['ruc'])) {
+            // Manejo de error si la práctica no está registrada o no se encuentra
+            // Redirigir o mostrar error 404
+            http_response_code(404);
+            die('Práctica o datos incompletos no encontrados.');
+        }
+
+        // 2. Generar el Contenido HTML (Usando tu vista limpia)
+        $html = $this->renderPdfHtmlView('pasantias_pdf_fase1', $data);
+
+        // 3. CONFIGURACIÓN Y GENERACIÓN DEL PDF CON DOMPDF
+
+        $options = new Options();
+        $options->set('defaultFont', 'Arial');
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isRemoteEnabled', true); // Necesario si usas imágenes externas o CSS remoto
+
+        // ¡Aquí se crea la variable $dompdf que te faltaba!
+        $dompdf = new Dompdf($options);
+
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        // 4. Enviar el archivo para descarga
+
+        // Asegúrate de que infoPersonal exista antes de intentar acceder a codigo_matricula
+        $codigo = $data['infoPersonal']['codigo_matricula'] ?? $id_practica;
+        $filename = 'Registro_Practica_' . $codigo . '.pdf';
+
+        if (ob_get_level() > 0) {
+            ob_end_clean(); // Limpiar buffer de salida
+        }
+
+        // El método stream fuerza la descarga del PDF al navegador
+        $dompdf->stream($filename, array("Attachment" => true));
+        exit;
+    }
+
+    // Asegúrate de tener esta función auxiliar para cargar la vista de PDF
+    protected function renderPdfHtmlView(string $viewName, array $data): string
+    {
+        extract($data);
+        // Ajusta la ruta para que apunte correctamente a tu archivo Views/pasantias_pdf_fase1.php
+        $path = __DIR__ . "/../Views/pasantias/{$viewName}.php";
+
+        if (!file_exists($path)) {
+            return "<h1>Error: Vista de PDF '{$viewName}' no encontrada.</h1>";
+        }
+
+        ob_start();
+        include $path;
+        return ob_get_clean();
     }
 }

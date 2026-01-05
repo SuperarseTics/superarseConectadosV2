@@ -2,6 +2,20 @@
     <h2 class="text-3xl font-bold text-superarse-morado-oscuro mb-6 border-b pb-2">Gestión de Prácticas
         Pre-Profesionales</h2>
 
+    <div class="flex justify-between items-center mb-6 border-b pb-2">
+
+        <?php if (!empty($data['infoPractica']['ruc'])): // Solo si la Fase 1 está completa
+        ?>
+            <?php $id_practica = htmlspecialchars($data['infoPractica']['id_practica'] ?? ''); ?>
+
+            <a href="<?php echo $this->basePath; ?>/pasantias/generatePdf/<?php echo $id_practica; ?>"
+                target="_blank"
+                class="ml-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-superarse-morado-oscuro hover:bg-superarse-rosa focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-superarse-morado-oscuro transition duration-300">
+                <i class="fas fa-file-pdf mr-2"></i> Descargar PDF
+            </a>
+        <?php endif; ?>
+    </div>
+
     <!-- ###################################################################### -->
     <!--                                 FASE 1: REGISTRO INICIAL               -->
     <!-- ###################################################################### -->
@@ -373,11 +387,34 @@
                 </div>
             </div>
         </div>
-        <?php if (empty($data['infoPractica']['ruc'])): ?>
+
+        <?php
+        // Verificamos si la práctica ya tiene el RUC de la empresa asociado.
+        // Asumimos que si tiene RUC, la Fase 1 está completa y ya NO se debe guardar, sino descargar.
+        $fase_uno_completada = !empty($data['infoPractica']['ruc']);
+        ?>
+
+        <?php if (!$fase_uno_completada): ?>
             <button type="submit"
                 class="w-full bg-superarse-rosa hover:bg-superarse-morado-medio text-white font-bold py-3 rounded-lg transition duration-300 mt-6">
                 Guardar Registro e Iniciar Práctica (Fase 1 Completa)
             </button>
+
+        <?php else: ?>
+            <?php
+            // Obtenemos el ID de la práctica, necesario para la URL del controlador
+            $id_practica = htmlspecialchars($data['infoPractica']['id_practica'] ?? '');
+
+            // Verificación de seguridad: solo mostrar si tenemos un ID
+            if (!empty($id_practica)):
+            ?>
+                <a href="<?php echo $this->basePath; ?>/pasantias/generatePdf/<?php echo $id_practica; ?>"
+                    target="_blank"
+                    class="inline-block w-full text-center bg-superarse-morado-oscuro hover:bg-superarse-rosa text-white font-bold py-3 rounded-lg transition duration-300 mt-6">
+                    <i class="fas fa-file-pdf mr-2"></i> Descargar Registro de Práctica (Fase 1)
+                </a>
+            <?php endif; ?>
+
         <?php endif; ?>
 
     </form>

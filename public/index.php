@@ -6,6 +6,8 @@ require_once '../app/Controllers/LoginController.php';
 require_once '../app/Controllers/EstudianteController.php';
 require_once '../app/Controllers/PagoController.php';
 require_once '../app/Controllers/PasantiaController.php';
+require_once '../vendor/autoload.php';
+ini_set('display_errors', 1);
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
@@ -24,6 +26,20 @@ if ($uri === '/pagos/upload-comprobante' && $method === 'POST') {
     $controller->uploadComprobante();
     exit();
 }
+
+// === INICIO: Manejo de Rutas con Parámetros Variables ===
+// Captura rutas como /pasantias/generatePdf/45, /pasantias/generatePdf/100, etc.
+if (preg_match('/^\/pasantias\/generatePdf\/(\d+)$/', $uri, $matches)) {
+    // $matches[1] contendrá el ID (ej: '45')
+    $id_practica = (int) $matches[1];
+
+    $controller = new PasantiaController();
+    $controller->generatePdf($id_practica);
+    exit(); // Detenemos la ejecución después de generar el PDF
+
+}
+// === FIN: Manejo de Rutas con Parámetros Variables ===
+
 switch ($uri) {
     case '/':
     case '/login':

@@ -25,7 +25,7 @@ class CredencialModel extends Database
       $cedulaParaMoodle = $userInfo['numero_identificacion'];
       
       // 2. Obtener la CLAVE de Moodle usando el numero_identificacion (CEDULA)
-      $userQueryMoodle = "SELECT CLAVE FROM usersMoodle WHERE CEDULA = :cedula LIMIT 1";
+      $userQueryMoodle = "SELECT CLAVE, NIVEL FROM usersMoodle WHERE CEDULA = :cedula LIMIT 1";
       $userStmtMoodle = $db->prepare($userQueryMoodle);
       // Usamos el valor de la CEDULA/numero_identificacion para la búsqueda
       $userStmtMoodle->execute([':cedula' => $cedulaParaMoodle]);
@@ -37,7 +37,8 @@ class CredencialModel extends Database
       
       // Corregido: Verificamos si la clave existe y accedemos a 'CLAVE', no a 'usuario'
       // Si no existe, usamos un valor por defecto (ej: 'N/A')
-      $plataformaContraseñaMoodle = $userInfoMoodle ? $userInfoMoodle['CLAVE'] : 'Clave no encontrada'; // Línea 27 Corregida
+      $plataformaContraseñaMoodle = $userInfoMoodle ? $userInfoMoodle['CLAVE'] : 'Clave no encontrada';
+      $plataformaNivelMoodle = $userInfoMoodle ? $userInfoMoodle['NIVEL'] : 'Nivel no encontrado';
       
       // 3. Obtener credenciales de la plataforma general
       $plataformaQuery = "SELECT 
@@ -61,6 +62,7 @@ class CredencialModel extends Database
           'usuario_acceso_moodle' => $plataformaUsuarioMoodle,
           'clave_acceso' => $p['clave_acceso'],
           'clave_acceso_moodle' => $plataformaContraseñaMoodle,
+          'nivel_acceso_moodle' => $plataformaNivelMoodle,
           'link_acceso' => $p['link_acceso']
         ];
       }

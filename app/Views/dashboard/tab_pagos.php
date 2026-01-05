@@ -4,32 +4,6 @@
     </div>
 
     <h3 class="text-xl font-semibold text-superarse-morado-oscuro mb-4">Resumen Financiero</h3>
-    <!--<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-
-        <div class="bg-green-100 p-4 rounded-lg shadow-md border border-green-300">
-            <p class="text-sm font-medium text-green-700">ABONO TOTAL</p>
-            <p class="text-2xl font-bold text-green-800 mt-1">
-                $<?php echo htmlspecialchars($data['infoPagos']['abono_total'] ?? '0.00'); // USANDO $data 
-                    ?>
-            </p>
-        </div>
-
-        <div class="bg-red-100 p-4 rounded-lg shadow-md border border-red-300">
-            <p class="text-sm font-medium text-red-700">SALDO TOTAL PENDIENTE</p>
-            <p class="text-2xl font-bold text-red-800 mt-1">
-                $<?php echo htmlspecialchars($data['infoPagos']['saldo_total'] ?? '0.00'); // USANDO $data 
-                    ?>
-            </p>
-        </div>
-
-        <div class="bg-blue-100 p-4 rounded-lg shadow-md border border-blue-300 md:col-span-1">
-            <p class="text-sm font-medium text-blue-700">ESTADO / OBSERVACIÓN</p>
-            <p class="text-base text-blue-800 mt-2">
-                <?php echo nl2br(htmlspecialchars($data['infoPagos']['observacion'] ?? 'Sin observaciones de pago.')); // USANDO $data 
-                ?>
-            </p>
-        </div>
-    </div>-->
     <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
 
         <!-- Tarjeta 1: ABONO TOTAL (EXISTENTE) -->

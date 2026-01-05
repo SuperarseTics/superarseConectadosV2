@@ -591,4 +591,113 @@ WHERE user_id = :userId LIMIT 1";
             return false;
         }
     }
+
+    /**
+     * Obtiene toda la información necesaria para el PDF de una práctica específica.
+     * Usa la consulta unificada proporcionada por el usuario.
+     * @param int $id_practica El ID de la práctica (pe.id_practica)
+     * @return array|null Un array con todos los datos o null si no se encuentra.
+     */
+    public function getPracticeFullData(int $id_practica): ?array
+    {
+        // Esta consulta unifica datos de Práctica, Entidad, Tutor Empresarial y Usuario (Estudiante)
+        $queryPractice = "SELECT
+        u.codigo_matricula, 
+        CONCAT(u.primer_nombre, ' ', u.segundo_nombre, ' ', u.primer_apellido, ' ',u.segundo_apellido) as 'nombre_completo',
+        u.numero_identificacion, u.usuario, u.nivel, u.programa, u.periodo,
+        pe.id_practica, pe.modalidad, pe.estado_fase_uno_completado, pe.afiliacion_iess,
+        pe.docente_asignado_id, pe.proyecto_id, pe.user_id,
+        ent.ruc, pmod.id_practica_modalidad,
+        ent.nombre_empresa, ent.razon_social, ent.persona_contacto, ent.telefono_contacto, ent.email_contacto,
+        ent.direccion, ent.plazas_disponibles,
+        tutemp.nombre_completo AS tutor_emp_nombre_completo, tutemp.cedula, tutemp.funcion,
+        tutemp.email AS tutor_emp_email, tutemp.telefono AS tutor_emp_telefono, tutemp.departamento,
+        doc.nombre_completo AS docente_nombre, doc.email AS docente_email
+        FROM
+            practicas_estudiantes pe
+        INNER JOIN practica_modalidad pmod ON pmod.modalidad = pe.modalidad
+        INNER JOIN entidades ent ON ent.id_entidad = pe.entidad_id
+        INNER JOIN users u on pe.user_id = u.id
+        LEFT JOIN tutores_empresariales tutemp ON tutemp.id_tutor_empresa = pe.tutor_empresarial_id
+        LEFT JOIN docentes doc on pe.docente_asignado_id = doc.id_docente
+        WHERE pe.id_practica = :id_practica";
+
+        $stmt = $this->db->prepare($queryPractice);
+        $stmt->execute([':id_practica' => $id_practica]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$result) {
+            return null; // No hay práctica con ese ID
+        }
+
+        // --- AGREGAR Y REESTRUCTURAR LA DATA PARA LA VISTA ---
+        // Reestructuramos el resultado plano de la consulta en un array $data
+        // que se asemeje a la estructura que usa tu vista original (tab_pasantias.php).
+
+        $data = [];
+
+        // 1. Datos de la Práctica y Entidad
+        $data['infoPractica'] = [
+            'id_practica' => $result['id_practica'],
+            'modalidad' => $result['modalidad'],
+            'estado_fase_uno_completado' => $result['estado_fase_uno_completado'],
+            'afiliacion_iess' => $result['afiliacion_iess'],
+            'ruc' => $result['ruc'],
+            'nombre_empresa' => $result['nombre_empresa'],
+            'razon_social' => $result['razon_social'],
+            'persona_contacto' => $result['persona_contacto'],
+            'telefono_contacto' => $result['telefono_contacto'],
+            'email_contacto' => $result['email_contacto'],
+            'direccion' => $result['direccion'],
+            'plazas_disponibles' => $result['plazas_disponibles'],
+            // ... otros campos que necesites de la práctica ...
+        ];
+
+        // 2. Datos Personales del Estudiante
+        $data['infoPersonal'] = [
+            'codigo_matricula' => $result['codigo_matricula'],
+            'numero_identificacion' => $result['numero_identificacion'],
+            'usuario' => $result['usuario'],
+            'nivel' => $result['nivel'],
+            'programa' => $result['programa'],
+            'periodo' => $result['periodo'],
+            'nombre_completo' => $result['nombre_completo'], // Usamos el alias de la consulta
+            // ...
+        ];
+        $data['nombreCompleto'] = $result['nombre_completo'];
+
+        // 3. Datos del Tutor Empresarial
+        $data['tutoresEmpresariales'] = [
+            [
+                'nombre_completo' => $result['tutor_emp_nombre_completo'],
+                'cedula' => $result['cedula'],
+                'funcion' => $result['funcion'],
+                'email' => $result['tutor_emp_email'],
+                'telefono' => $result['tutor_emp_telefono'],
+                'departamento' => $result['departamento'],
+            ]
+        ];
+        $data['cantidadTutores'] = 1; // Asumo 1 por la consulta LEFT JOIN
+
+        // 4. Datos del Tutor Académico (Docente Asignado)
+        // Se usa el nombre 'tutoresAcademicos' para seguir el patrón de tu vista
+        $data['tutoresAcademicos'] = [
+            [
+                'nombre_completo' => $result['docente_nombre'],
+                'email' => $result['docente_email']
+            ]
+        ];
+
+        // 5. Datos de Proyecto (Si aplica)
+        // Como tu consulta solo trae el ID del proyecto, necesitas un paso extra
+        // para obtener la descripción, carreras y lugar si es necesario para el PDF.
+        $data['infoProyectos'] = []; // Inicializamos vacío si no lo usas o lo agregas aquí.
+        if ($result['proyecto_id']) {
+            // Ejecuta otra consulta o un método para obtener detalles del proyecto
+            // $project_details = $this->getProjectDetails($result['proyecto_id']);
+            // $data['infoProyectos'] = [$project_details];
+        }
+
+        return $data;
+    }
 }
